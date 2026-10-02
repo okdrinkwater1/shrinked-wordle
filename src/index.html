@@ -36,6 +36,12 @@
         display: flex;
         flex-wrap:wrap;
       }
+      #answer_{
+        font-size:20px;
+        margin-bottom:0;
+        margin-top:100px;
+        color:cyan;
+      }
       .tile{
         border:2px solid lightgray;
         width: 60px;
@@ -80,6 +86,7 @@
     <div id="board">
     </div>
     <br>
+    <h3 id="answer_"></h3>
     <h1 id="answer"></h1>
     <p><span class="box correct"></span>In the word and in the correct spot</p>
     <p><span class="box present"></span>In the word but not in the correct spot</p>
@@ -130,6 +137,7 @@
         if(!game_over&&row==height){
             game_over=true;
             document.getElementById("answer").innerText=word;
+            document.getElementById("answer_").innerText="Correct Answer";
         }
         
   });
