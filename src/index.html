@@ -5,182 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wordle</title>
     <style>
-      body{
-        font-family:Arial, Helvetica, sans-serif;
-        text-align:center;
-        background-color:black;
-        color:white;
-      }
-      h1{
-        font-size:60px
-      }
-      hr{
-        width: 500px;
-      }
-      #title{
-        font-size: 36px;
-        font-weight: bold;
-        letter-spacing: 2px;
-      }
-      #rect{
-        border:1px solid white;
-        width:max-content;
-        margin:20px auto;
-        padding:0 40px 20px;
-      }
-      #board {
-        width: 350px;
-        height: 420px;
-        margin: 0 auto;
-        margin-top: 3px;
-        display: flex;
-        flex-wrap:wrap;
-      }
-      #answer_{
-        font-size:20px;
-        margin-bottom:0;
-        margin-top:100px;
-        color:cyan;
-      }
-      .tile{
-        border:2px solid lightgray;
-        width: 60px;
-        height:60px;
-        margin: 2.5px;
-
-        color: white;
-        font-size: 36px;
-        font-weight: bold;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .correct {
-        background-color: green;
-        color: white;
-        border-color: white;
-      }
-      .present {
-        background-color: navy;
-        color: white;
-        border-color: white;
-      }
-      .absent {
-       background-color: purple;
-       color: white;
-       border-color: white;
-      }
-      .box{
-        width:25px;
-        height:25px;
-        display:inline-block;
-        vertical-align:middle;
-        margin-right:10px;
-      }
+      body{font-family:Arial, Helvetica, sans-serif;text-align:center;background-color:black;color:white;}
+      h1{font-size:60px}
+      #r{border:1px solid white;width:max-content;margin:20px auto;padding:0 40px 20px;}
+      #b{width:350px;height:420px;margin:0 auto;margin-top:3px;display:flex;flex-wrap:wrap;}
+      #a{font-size:20px;margin-bottom:0;margin-top:100px;color:cyan;}
+      .t{border:2px solid lightgray;width: 60px;height:60px;margin: 2.5px;color: white;font-size:36px;font-weight:bold;display:flex;justify-content: center;align-items: center;}
+      .c{background-color:green;color:white;border-color:white;}
+      .p{background-color:navy;color:white;border-color:white;}
+      .a{background-color:purple;color:white;border-color:white;}
+      .b{width:25px;height:25px;display:inline-block;vertical-align:middle;margin-right:10px;}
     </style>
 </head>
 <body>
-    <div id="rect">
+    <div id="r">
     <h1>Wordle</h1>
     <br>
-    <div id="board">
+    <div id="b">
     </div>
     <br>
-    <h3 id="answer_"></h3>
-    <h1 id="answer"></h1>
-    <p><span class="box correct"></span>In the word and in the correct spot</p>
-    <p><span class="box present"></span>In the word but not in the correct spot</p>
-    <p><span class="box absent"></span>Not in the word</p>
+    <h3 id="a"></h3>
+    <h1 id="a1"></h1>
+    <p><span class="b c"></span>In the word and in the correct spot</p>
+    <p><span class="b p"></span>In the word but not in the correct spot</p>
+    <p><span class="b a"></span>Not in the word</p>
    </div>
 </body>
 <script>
-  const height=6,width= 5;
-  let row=0, col=0;
-  let game_over=false; let flag=false;
-  const word= "TRACE";
-
-  const start = ()=>{
-    for(let r=0;r<height;r++){
-        for(let c=0;c<width;c++){
-            let tile=document.createElement("span");
-            tile.id=r.toString() + "-" + c.toString();
-            tile.classList.add("tile");
-            tile.innerText="";
-            document.getElementById("board").appendChild(tile);
+  const h=6,w=5,word="TRACE";
+  let r1=0,c1=0,over=false;
+  const start =()=>{
+    for(let r=0;r<h;r++){
+        for(let c=0;c<w;c++){
+            let t=document.createElement("span");
+            t.id=r.toString() + "-" + c.toString();
+            t.classList.add("t");
+            t.innerText="";
+            document.getElementById("b").appendChild(t);
         }
     }
   };
   start();
     document.addEventListener("keyup", (e)=> {
-    if(game_over)return;
+    if(over)return;
     if("KeyA"<=e.code && "KeyZ">=e.code){
-        if(col<width){
-            let current_tile=document.getElementById(row.toString() + '-' + col.toString());
+        if(c1<w){
+            let current_tile=document.getElementById(r1.toString() + '-' + c1.toString());
             if(current_tile.innerText==""){
                 current_tile.innerText=e.code[3];
-                col+=1;
+                c1+=1;
                 type_sound(e.code[3]);
             }
         }
     }
         else if(e.code=="Backspace"){
-            if(col>0)backspace_sound();
-            if(0<col&&col<=width){
-                    col-=1;
-             }
-            let current_tile= document.getElementById(row.toString() + '-' + col.toString());
+            if(c1>0)backspace_sound();
+            if(0<c1&&c1<=w)c1-=1;
+            let current_tile= document.getElementById(r1.toString() + '-' + c1.toString());
             current_tile.innerText="";
         }
-        else if(e.code=="Enter"&&col==width){
+        else if(e.code=="Enter"&&c1==w){
             update();
-            if(game_over)victory_sound();
+            if(over)victory_sound();
             else enter_sound();
-            row+=1;
-            col=0;
+            r1+=1;
+            c1=0;
         }
-        if(!game_over&&row==height){
-            game_over=true;
-            document.getElementById("answer").innerText=word;
-            document.getElementById("answer_").innerText="Correct Answer";
+        if(!over&&r1==h){
+            over=true;
+            document.getElementById("a1").innerText=word;
+            document.getElementById("a").innerText="Correct Answer";
         }
         
   });
-
-  const update=()=>{
-    let correct=0;
-    let letter_count={};
+    const update=()=>{
+    let corr=0,letter_count={};
     for(let i=0;i<word.length;i++){
         letter=word[i];
-        if(letter_count[letter]){
-            letter_count[letter]+=1;
-        }
-        else{
-            letter_count[letter]=1;
-        }
+        if(letter_count[letter])letter_count[letter]+=1;
+        else letter_count[letter]=1;
     }
-    for(let c=0;c<width;c++){
-        let current_tile=document.getElementById(row.toString()+'-'+c.toString());
+    for(let c=0;c<w;c++){
+        let current_tile=document.getElementById(r1.toString()+'-'+c.toString());
         let letter=current_tile.innerText;
-        if(word[c]==letter){
-            current_tile.classList.add("correct");
-            correct+=1;
-            letter_count[letter]-=1;
-        }
-        if(correct==width){
-            game_over=true;
-        }
+        if(word[c]==letter){current_tile.classList.add("c");corr+=1;letter_count[letter]-=1;}
+        if(corr==w)over=true;
     }
-     for(let c=0;c<width;c++){
-         let current_tile=document.getElementById(row.toString()+'-'+c.toString());
+     for(let c=0;c<w;c++){
+         let current_tile=document.getElementById(r1.toString()+'-'+c.toString());
          let letter=current_tile.innerText;
-      if(!current_tile.classList.contains("correct")){
+      if(!current_tile.classList.contains("c")){
         if(word.includes(letter)&&letter_count[letter]>0){
-            current_tile.classList.add("present");
-            letter_count[letter]-=1;
-        }
-        else{
-            current_tile.classList.add("absent");
-        }
+            current_tile.classList.add("p");
+            letter_count[letter]-=1;}
+        else current_tile.classList.add("a");
       }
     }
   }
