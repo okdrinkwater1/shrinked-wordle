@@ -94,7 +94,7 @@
    </div>
 </body>
 <script>
-  const height=6, width= 5;
+  const height=6,width= 5;
   let row=0, col=0;
   let game_over=false; let flag=false;
   const word= "TRACE";
@@ -119,10 +119,12 @@
             if(current_tile.innerText==""){
                 current_tile.innerText=e.code[3];
                 col+=1;
+                type_sound(e.code[3]);
             }
         }
     }
         else if(e.code=="Backspace"){
+            if(col>0)backspace_sound();
             if(0<col&&col<=width){
                     col-=1;
              }
@@ -131,6 +133,8 @@
         }
         else if(e.code=="Enter"&&col==width){
             update();
+            if(game_over)victory_sound();
+            else enter_sound();
             row+=1;
             col=0;
         }
@@ -180,5 +184,48 @@
       }
     }
   }
+  let audio_ctx=null;
+  document.addEventListener("keydown", ()=>{
+    if(!audio_ctx)audio_ctx=new AudioContext();
+    audio_ctx.resume();
+    });
+    const hz=(n)=>440*Math.pow(2,(n-69)/12);
+    const A3=57,E3=52,A4=69,E5=76,C5=72,G5=79,C6=84;
+    const m=(midi,s,d,type,vol,cutoff)=>{
+      if(!audio_ctx)return;
+      const t=audio_ctx.currentTime+s;
+      const o=audio_ctx.createOscillator();
+      const g=audio_ctx.createGain();
+      const f=audio_ctx.createBiquadFilter();
+      o.type=type;
+      o.frequency.setValueAtTime(hz(midi),t);
+      f.type="lowpass";
+      f.frequency.value=cutoff;
+      g.gain.setValueAtTime(vol,t);
+      g.gain.exponentialRampToValueAtTime(0.001,t+d);
+      o.connect(f);
+      f.connect(g);
+      g.connect(audio_ctx.destination);
+      o.start(t);
+      o.stop(t+d);
+    };
+    const type_sound=(letter)=>{
+      m(60+(letter.charCodeAt(0)-65),0,0.09,"triangle",0.15,8000);
+    };
+    const backspace_sound=()=>{
+      m(A3,0,0.1,"square", 0.15,400);
+      m(E3,0.08,0.15,"square",0.15,400);
+    };
+    const enter_sound=()=>{
+      m(A4,0,0.12,"triangle",0.2,6000);
+      m(E5,0.1,0.2,"triangle",0.2,6000);
+    };
+    const victory_sound=()=>{
+      [C5,E5,G5,C6].forEach((n,i)=>{
+        m(n,i*0.15,i==3?0.9:0.3,"triangle",0.2,8000);
+      });
+      m(E5,0.45,0.9,"triangle",0.12,8000);
+      m(G5,0.45,0.9,"triangle",0.12,8000);
+    };
 </script>
 </html>
